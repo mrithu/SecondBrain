@@ -20,7 +20,11 @@ from agents.orchestrator import run_orchestrator
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await get_pool()   # warm up connection pool
+    try:
+        await get_pool()
+        print("DB pool warmed up successfully")
+    except Exception as e:
+        print(f"DB warmup failed, will retry on first request: {e}")
     yield
     await close_pool()
 
@@ -169,5 +173,10 @@ async def get_memory(session_id: str, limit: int = 20):
 @app.get("/health")
 async def health():
     pool = await get_pool()
-    await pool.fetchval("SELECT 1")
+    if pool is None:
+        raise HTTPException(status_code=503, detail="Database unavailable")
+    try:
+        await pool.fetchval("SELECT 1")
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"DB error: {str(e)}")
     return {"status": "ok", "db": "alloydb", "timestamp": datetime.utcnow().isoformat()}

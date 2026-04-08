@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Second Brain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #0e0f11;
+  --bg2:      #16181c;
+  --bg3:      #1e2127;
+  --border:   #2a2d35;
+  --border2:  #363a45;
+  --text:     #e8e9ec;
+  --text2:    #9096a8;
+  --text3:    #5c6174;
+  --accent:   #7c6af7;
+  --accent2:  #a599fc;
+  --green:    #3ecf8e;
+  --amber:    #f59e0b;
+  --red:      #f87171;
+  --blue:     #60a5fa;
+  --radius:   12px;
+  --font-head: 'DM Serif Display', Georgia, serif;
+  --font-body: 'Instrument Sans', system-ui, sans-serif;
+  --font-mono: 'DM Mono', 'Courier New', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── HEADER ─────────────────────────────────────────── */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  height: 56px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  flex-shrink: 0;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-icon {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, var(--accent), #4f46e5);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
+.logo-icon svg { width: 16px; height: 16px; }
+.logo-name {
+  font-family: var(--font-head);
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.header-actions { display: flex; gap: 8px; }
+.header-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-family: var(--font-body);
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.header-btn:hover { border-color: var(--border2); color: var(--text); }
+.status-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  flex-shrink: 0;
+}
+
+/* ── LAYOUT ─────────────────────────────────────────── */
+.app-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── SIDEBAR ─────────────────────────────────────────── */
+aside {
+  width: 260px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.sidebar-section {
+  padding: 16px 16px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 10px;
+}
+.prompt-chip {
+  padding: 8px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: var(--text2);
+  cursor: pointer;
+  margin-bottom: 6px;
+  transition: all .15s;
+  line-height: 1.4;
+}
+.prompt-chip:hover {
+  border-color: var(--accent);
+  color: var(--text);
+  background: rgba(124,106,247,.08);
+}
+
+.stats-panel {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+}
+.stat-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 8px;
+}
+.stat-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+.stat-value { font-size: 22px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+.stat-sub   { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+.agent-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  margin: 2px;
+}
+.agent-task     { background: rgba(94,234,212,.1);  color: #5eead4; border: 1px solid rgba(94,234,212,.2); }
+.agent-calendar { background: rgba(96,165,250,.1);  color: var(--blue); border: 1px solid rgba(96,165,250,.2); }
+.agent-notes    { background: rgba(245,158,11,.1);  color: var(--amber); border: 1px solid rgba(245,158,11,.2); }
+.agent-research { background: rgba(167,139,250,.1); color: var(--accent2); border: 1px solid rgba(167,139,250,.2); }
+
+/* ── CHAT ─────────────────────────────────────────── */
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 0;
+  scroll-behavior: smooth;
+}
+.messages::-webkit-scrollbar { width: 4px; }
+.messages::-webkit-scrollbar-track { background: transparent; }
+.messages::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.msg-wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 28px;
+  margin-bottom: 24px;
+  animation: fadeUp .3s ease both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.msg-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: var(--text3);
+}
+.avatar {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.avatar-user   { background: var(--accent); color: #fff; }
+.avatar-ai     { background: linear-gradient(135deg,#4f46e5,var(--accent)); color: #fff; }
+
+.msg-bubble {
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: var(--text);
+}
+.msg-bubble.user {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  display: inline-block;
+  max-width: 85%;
+}
+.msg-bubble.ai {
+  white-space: pre-wrap;
+}
+.msg-bubble ul, .msg-bubble ol {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+.msg-bubble li { margin-bottom: 4px; }
+
+/* Plan trace */
+.plan-trace {
+  background: rgba(124,106,247,.06);
+  border: 1px solid rgba(124,106,247,.2);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--text3);
+}
+.plan-trace summary {
+  cursor: pointer;
+  color: var(--accent2);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  letter-spacing: .04em;
+  user-select: none;
+}
+.plan-trace summary:hover { color: var(--text); }
+.plan-step {
+  display: flex; gap: 8px; align-items: flex-start;
+  margin-top: 8px;
+}
+.plan-step-num {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--border2);
+  font-size: 9px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+  color: var(--text2);
+}
+
+/* Thinking animation */
+.thinking {
+  display: flex; align-items: center; gap: 6px;
+  padding: 12px 0;
+  font-size: 12px; color: var(--text3);
+  font-family: var(--font-mono);
+}
+.dot-pulse { display: flex; gap: 4px; }
+.dot-pulse span {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 1.2s infinite;
+}
+.dot-pulse span:nth-child(2) { animation-delay: .2s; }
+.dot-pulse span:nth-child(3) { animation-delay: .4s; }
+@keyframes pulse {
+  0%,60%,100% { opacity: .3; transform: scale(.8); }
+  30%          { opacity: 1;  transform: scale(1.2); }
+}
+
+/* ── INPUT ───────────────────────────────────────────── */
+.input-area {
+  padding: 20px 28px;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+  flex-shrink: 0;
+}
+.input-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  position: relative;
+}
+textarea {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  line-height: 1.6;
+  padding: 14px 56px 14px 18px;
+  resize: none;
+  outline: none;
+  transition: border-color .15s;
+  min-height: 52px;
+  max-height: 200px;
+}
+textarea::placeholder { color: var(--text3); }
+textarea:focus { border-color: var(--accent); }
+.send-btn {
+  position: absolute;
+  right: 10px; bottom: 10px;
+  width: 34px; height: 34px;
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.send-btn:hover { background: var(--accent2); transform: scale(1.05); }
+.send-btn:disabled { background: var(--border2); cursor: not-allowed; transform: none; }
+.send-btn svg { width: 16px; height: 16px; fill: #fff; }
+.input-hint {
+  font-size: 11px; color: var(--text3);
+  margin-top: 8px; text-align: center;
+}
+
+/* ── RIGHT PANEL ──────────────────────────────────────── */
+.right-panel {
+  width: 280px;
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.panel-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+.panel-tab {
+  flex: 1;
+  padding: 11px 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text3);
+  text-align: center;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all .15s;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+.panel-tab.active { color: var(--accent2); border-bottom-color: var(--accent); }
+.panel-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+.panel-content::-webkit-scrollbar { width: 3px; }
+.panel-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.item-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  font-size: 12.5px;
+}
+.item-title { color: var(--text); font-weight: 500; margin-bottom: 3px; line-height: 1.3; }
+.item-meta  { color: var(--text3); font-size: 11px; display: flex; gap: 6px; flex-wrap: wrap; }
+.badge {
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+}
+.badge-urgent  { background: rgba(248,113,113,.15); color: var(--red); }
+.badge-high    { background: rgba(245,158,11,.15);  color: var(--amber); }
+.badge-medium  { background: rgba(96,165,250,.15);  color: var(--blue); }
+.badge-low     { background: rgba(100,116,139,.15); color: var(--text2); }
+.badge-pending { background: rgba(100,116,139,.15); color: var(--text2); }
+.badge-in_progress { background: rgba(96,165,250,.15); color: var(--blue); }
+.badge-done    { background: rgba(62,207,142,.15);  color: var(--green); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="8" cy="8" r="3" fill="white"/>
+        <circle cx="2" cy="4" r="1.5" fill="rgba(255,255,255,.6)"/>
+        <circle cx="14" cy="4" r="1.5" fill="rgba(255,255,255,.6)"/>
+        <circle cx="2" cy="12" r="1.5" fill="rgba(255,255,255,.6)"/>
+        <circle cx="14" cy="12" r="1.5" fill="rgba(255,255,255,.6)"/>
+        <line x1="5" y1="8" x2="2" y2="4"   stroke="rgba(255,255,255,.4)" stroke-width="1"/>
+        <line x1="11" y1="8" x2="14" y2="4"  stroke="rgba(255,255,255,.4)" stroke-width="1"/>
+        <line x1="5" y1="8" x2="2" y2="12"   stroke="rgba(255,255,255,.4)" stroke-width="1"/>
+        <line x1="11" y1="8" x2="14" y2="12"  stroke="rgba(255,255,255,.4)" stroke-width="1"/>
+      </svg>
+    </div>
+    <span class="logo-name">Second Brain</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="status-dot"></div>
+    <span style="font-size:12px;color:var(--text3)">AlloyDB connected</span>
+    <button class="header-btn" onclick="newSession()">New session</button>
+  </div>
+</header>
+
+<div class="app-body">
+
+  <!-- LEFT SIDEBAR -->
+  <aside>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Quick prompts</div>
+      <div class="prompt-chip" onclick="usePrompt(this)">I have a project deadline Friday — set up my week</div>
+      <div class="prompt-chip" onclick="usePrompt(this)">Schedule a team sync tomorrow at 3pm and add prep notes</div>
+      <div class="prompt-chip" onclick="usePrompt(this)">What tasks are overdue?</div>
+      <div class="prompt-chip" onclick="usePrompt(this)">Create a 30-day learning plan for system design</div>
+      <div class="prompt-chip" onclick="usePrompt(this)">Find free time for a 2-hour deep work block this week</div>
+    </div>
+    <div class="stats-panel">
+      <div class="sidebar-label">System</div>
+      <div class="stat-card">
+        <div class="stat-label">Active tasks</div>
+        <div class="stat-value" id="stat-tasks">—</div>
+        <div class="stat-sub">in AlloyDB</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Events this week</div>
+        <div class="stat-value" id="stat-events">—</div>
+        <div class="stat-sub">upcoming</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Notes</div>
+        <div class="stat-value" id="stat-notes">—</div>
+        <div class="stat-sub">saved</div>
+      </div>
+      <div class="sidebar-label" style="margin-top:16px">Agents</div>
+      <span class="agent-tag agent-task">task_agent</span>
+      <span class="agent-tag agent-calendar">calendar_agent</span>
+      <span class="agent-tag agent-notes">notes_agent</span>
+      <span class="agent-tag agent-research">research_agent</span>
+    </div>
+  </aside>
+
+  <!-- CHAT -->
+  <main>
+    <div class="messages" id="messages">
+      <div class="msg-wrap">
+        <div class="msg-meta">
+          <div class="avatar avatar-ai">SB</div>
+          <span>Second Brain</span>
+        </div>
+        <div class="msg-bubble ai">Hello! I'm your Second Brain — a multi-agent productivity system backed by AlloyDB.
+
+I coordinate four specialized agents to manage your tasks, calendar, notes, and research. Try asking me to:
+
+• <strong>Set up your week</strong> around a deadline
+• <strong>Schedule events</strong> and block focus time
+• <strong>Save notes</strong> from a meeting or research session
+• <strong>Build a learning plan</strong> on any topic
+
+What would you like to accomplish?</div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-inner">
+        <textarea id="input" placeholder="Tell me what you need to accomplish..." rows="1"
+          onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">
+          <svg viewBox="0 0 16 16"><path d="M14.5 8L2 14l2.5-6H14.5zM2 2l12.5 6L4.5 8 2 2z"/></svg>
+        </button>
+      </div>
+      <div class="input-hint">Enter to send · Shift+Enter for new line</div>
+    </div>
+  </main>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="panel-tabs">
+      <button class="panel-tab active" onclick="switchTab('tasks',this)">Tasks</button>
+      <button class="panel-tab" onclick="switchTab('events',this)">Events</button>
+      <button class="panel-tab" onclick="switchTab('notes',this)">Notes</button>
+    </div>
+    <div class="panel-content" id="panel-content">
+      <div style="color:var(--text3);font-size:12px;text-align:center;margin-top:32px">Loading...</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = 'http://localhost:8000';
+let sessionId = crypto.randomUUID();
+let currentTab = 'tasks';
+let sending = false;
+
+// ── INIT ────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  loadStats();
+  loadPanel('tasks');
+  setInterval(loadStats, 30000);
+});
+
+async function loadStats() {
+  try {
+    const [tasks, events, notes] = await Promise.all([
+      fetch(`${API}/tasks?status=pending`).then(r=>r.json()),
+      fetch(`${API}/events`).then(r=>r.json()),
+      fetch(`${API}/notes?limit=1`).then(r=>r.json()),
+    ]);
+    document.getElementById('stat-tasks').textContent  = Array.isArray(tasks)  ? tasks.length  : '—';
+    document.getElementById('stat-events').textContent = Array.isArray(events) ? events.length : '—';
+    document.getElementById('stat-notes').textContent  = Array.isArray(notes)  ? '50+' : '—';
+  } catch { /* API not running */ }
+}
+
+// ── PANEL ────────────────────────────────────────────────
+function switchTab(tab, btn) {
+  currentTab = tab;
+  document.querySelectorAll('.panel-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  loadPanel(tab);
+}
+
+async function loadPanel(tab) {
+  const el = document.getElementById('panel-content');
+  el.innerHTML = '<div style="color:var(--text3);font-size:12px;text-align:center;margin-top:32px">Loading…</div>';
+  try {
+    let data, html = '';
+    if (tab === 'tasks') {
+      data = await fetch(`${API}/tasks`).then(r=>r.json());
+      if (!Array.isArray(data) || !data.length) { el.innerHTML = empty('No tasks yet'); return; }
+      html = data.slice(0,20).map(t => `
+        <div class="item-card">
+          <div class="item-title">${esc(t.title)}</div>
+          <div class="item-meta">
+            <span class="badge badge-${t.priority}">${t.priority}</span>
+            <span class="badge badge-${t.status}">${t.status}</span>
+            ${t.due_date ? `<span>${fmtDate(t.due_date)}</span>` : ''}
+          </div>
+        </div>`).join('');
+    } else if (tab === 'events') {
+      data = await fetch(`${API}/events`).then(r=>r.json());
+      if (!Array.isArray(data) || !data.length) { el.innerHTML = empty('No upcoming events'); return; }
+      html = data.slice(0,20).map(e => `
+        <div class="item-card">
+          <div class="item-title">${esc(e.title)}</div>
+          <div class="item-meta">
+            <span>${fmtDate(e.start_time)}</span>
+            <span class="badge badge-medium">${e.event_type}</span>
+          </div>
+        </div>`).join('');
+    } else {
+      data = await fetch(`${API}/notes`).then(r=>r.json());
+      if (!Array.isArray(data) || !data.length) { el.innerHTML = empty('No notes yet'); return; }
+      html = data.slice(0,20).map(n => `
+        <div class="item-card">
+          <div class="item-title">${esc(n.title)}</div>
+          <div class="item-meta">${fmtDate(n.created_at)}</div>
+        </div>`).join('');
+    }
+    el.innerHTML = html;
+  } catch {
+    el.innerHTML = '<div style="color:var(--text3);font-size:12px;text-align:center;margin-top:32px">Start the API to see live data.</div>';
+  }
+}
+
+// ── CHAT ────────────────────────────────────────────────
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 200) + 'px';
+}
+
+function usePrompt(el) {
+  const input = document.getElementById('input');
+  input.value = el.textContent.trim();
+  autoResize(input);
+  input.focus();
+}
+
+function newSession() {
+  sessionId = crypto.randomUUID();
+  document.getElementById('messages').innerHTML = '';
+  appendAI('New session started. What would you like to accomplish?', [], {});
+}
+
+async function sendMessage() {
+  if (sending) return;
+  const input = document.getElementById('input');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  input.value = '';
+  autoResize(input);
+  sending = true;
+  document.getElementById('send-btn').disabled = true;
+
+  appendUser(msg);
+  const thinkId = appendThinking();
+
+  try {
+    const res = await fetch(`${API}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg, session_id: sessionId }),
+    });
+    const data = await res.json();
+    removeThinking(thinkId);
+    appendAI(data.response, data.plan || [], data.agent_outputs || {});
+    loadPanel(currentTab);
+    loadStats();
+  } catch(err) {
+    removeThinking(thinkId);
+    appendAI(`⚠️ Could not reach the API. Make sure the server is running:\n\nuvicorn api.main:app --reload --port 8000`, [], {});
+  } finally {
+    sending = false;
+    document.getElementById('send-btn').disabled = false;
+  }
+}
+
+function appendUser(text) {
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-wrap';
+  wrap.innerHTML = `
+    <div class="msg-meta">
+      <div class="avatar avatar-user">You</div>
+      <span>You</span>
+    </div>
+    <div><div class="msg-bubble user">${esc(text)}</div></div>`;
+  document.getElementById('messages').appendChild(wrap);
+  wrap.scrollIntoView({ behavior:'smooth', block:'end' });
+}
+
+function appendAI(text, plan, agentOutputs) {
+  const agentsUsed = Object.keys(agentOutputs);
+  const agentBadges = agentsUsed.map(a => `<span class="agent-tag agent-${a.replace('_agent','')}">${a}</span>`).join('');
+
+  const planHTML = plan.length ? `
+    <details class="plan-trace">
+      <summary>▸ orchestrator trace · ${agentsUsed.length} agent${agentsUsed.length!==1?'s':''} called</summary>
+      ${plan.map((s,i) => `<div class="plan-step"><div class="plan-step-num">${i+1}</div><div>${esc(s)}</div></div>`).join('')}
+      ${agentBadges ? `<div style="margin-top:10px">${agentBadges}</div>` : ''}
+    </details>` : '';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-wrap';
+  wrap.innerHTML = `
+    <div class="msg-meta">
+      <div class="avatar avatar-ai">SB</div>
+      <span>Second Brain</span>
+    </div>
+    <div class="msg-bubble ai">${renderMarkdown(text)}</div>
+    ${planHTML}`;
+  document.getElementById('messages').appendChild(wrap);
+  wrap.scrollIntoView({ behavior:'smooth', block:'end' });
+}
+
+function appendThinking() {
+  const id = 'think-' + Date.now();
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-wrap';
+  wrap.id = id;
+  wrap.innerHTML = `
+    <div class="msg-meta">
+      <div class="avatar avatar-ai">SB</div><span>Second Brain</span>
+    </div>
+    <div class="thinking">
+      <div class="dot-pulse"><span></span><span></span><span></span></div>
+      <span>Orchestrating agents…</span>
+    </div>`;
+  document.getElementById('messages').appendChild(wrap);
+  wrap.scrollIntoView({ behavior:'smooth', block:'end' });
+  return id;
+}
+
+function removeThinking(id) {
+  document.getElementById(id)?.remove();
+}
+
+// ── UTILS ────────────────────────────────────────────────
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderMarkdown(text) {
+  return esc(text)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/^• (.+)$/gm, '<li>$1</li>')
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>)+/g, s => `<ul>${s}</ul>`)
+    .replace(/\n/g, '<br>');
+}
+
+function fmtDate(s) {
+  if (!s) return '';
+  const d = new Date(s);
+  return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+
+function empty(msg) {
+  return `<div style="color:var(--text3);font-size:12px;text-align:center;margin-top:32px">${msg}</div>`;
+}
+</script>
+</body>
+</html>

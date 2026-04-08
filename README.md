@@ -4,7 +4,7 @@ A multi-agent AI system built with Claude that manages tasks, schedules, and not
 
 demo: [video](https://drive.google.com/file/d/10Wp3IANVp--_2_0sOgR2alaaCcedDFQw/view?usp=drive_link)
 deck: [slides](https://github.com/mrithu/SecondBrain/blob/main/SecondBrain_MrithulaKL.pdf)
-
+deployment: [site](https://secondbrain-1024066444984.us-central1.run.app/)
 ---
 
 ## Architecture
